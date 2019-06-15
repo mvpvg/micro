@@ -27,6 +27,7 @@ var (
 	flagStartPos  = flag.String("startpos", "", "LINE,COL to start the cursor at when opening a buffer.")
 	flagConfigDir = flag.String("config-dir", "", "Specify a custom location for the configuration directory")
 	flagOptions   = flag.Bool("options", false, "Show all option help")
+	optionFlags   map[string]*string
 )
 
 func InitFlags() {
@@ -50,7 +51,7 @@ func InitFlags() {
 		fmt.Println("\nUse `micro -options` to see the full list of configuration options")
 	}
 
-	optionFlags := make(map[string]*string)
+	optionFlags = make(map[string]*string)
 
 	for k, v := range config.DefaultGlobalSettings() {
 		optionFlags[k] = flag.String(k, "", fmt.Sprintf("The %s option. Default value: '%v'", k, v))
@@ -73,16 +74,6 @@ func InitFlags() {
 			fmt.Printf("    \tDefault value: '%v'\n", v)
 		}
 		os.Exit(0)
-	}
-	for k, v := range optionFlags {
-		if *v != "" {
-			nativeValue, err := config.GetNativeValue(k, config.GlobalSettings[k], *v)
-			if err != nil {
-				screen.TermMessage(err)
-				continue
-			}
-			config.GlobalSettings[k] = nativeValue
-		}
 	}
 }
 
@@ -151,13 +142,6 @@ func main() {
 
 	InitLog()
 
-	config.InitRuntimeFiles()
-	err = config.ReadSettings()
-	if err != nil {
-		screen.TermMessage(err)
-	}
-	config.InitGlobalSettings()
-
 	InitFlags()
 
 	err = config.InitConfigDir(*flagConfigDir)
@@ -165,10 +149,35 @@ func main() {
 		screen.TermMessage(err)
 	}
 
+	config.InitRuntimeFiles()
+	err = config.ReadSettings()
+	if err != nil {
+		screen.TermMessage(err)
+	}
+	config.InitGlobalSettings()
+
+	// flag options
+	for k, v := range optionFlags {
+		if *v != "" {
+			nativeValue, err := config.GetNativeValue(k, config.GlobalSettings[k], *v)
+			if err != nil {
+				screen.TermMessage(err)
+				continue
+			}
+			config.GlobalSettings[k] = nativeValue
+		}
+	}
+
 	action.InitBindings()
 	action.InitCommands()
 
 	err = config.InitColorscheme()
+	if err != nil {
+		screen.TermMessage(err)
+	}
+
+	config.LoadAllPlugins()
+	err = config.RunPluginFn("init")
 	if err != nil {
 		screen.TermMessage(err)
 	}
