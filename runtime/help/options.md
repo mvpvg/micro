@@ -51,6 +51,11 @@ Here are the options that you can set:
 
 	default value: `true`
 
+* `encoding`: the encoding to open and save files with. Supported encodings
+   are listed at https://www.w3.org/TR/encoding/.
+
+    default value: `utf-8`
+
 * `eofnewline`: micro will automatically add a newline to the file.
 
 	default value: `false`
@@ -106,6 +111,16 @@ Here are the options that you can set:
    the statusline. To disable this, simply by `Alt-g` to `UnbindKey`.
 
 	default value: `false`
+
+* `matchbrace`: highlight matching braces for '()', '{}', '[]'
+
+    default value: `false`
+
+* `matchbraceleft`: when matching a closing brace, should matching match the
+   brace directly under the cursor, or the character to the left? only matters
+   if `matchbrace` is true
+
+    default value: `false`
 
 * `mouse`: whether to enable mouse support. When mouse support is disabled,
    usually the terminal will be able to access mouse events which can be useful
@@ -188,25 +203,15 @@ Here are the options that you can set:
 
 	default value: `true`
 
-* `matchbrace`: highlight matching braces for '()', '{}', '[]'
-
-    default value: `false`
-
-* `matchbraceleft`: when matching a closing brace, should matching match the
-   brace directly under the cursor, or the character to the left? only matters
-   if `matchbrace` is true
-
-    default value: `false`
-
-* `syntax`: turns syntax on or off.
-
-	default value: `true`
-
 * `sucmd`: specifies the super user command. On most systems this is "sudo" but
    on BSD it can be "doas." This option can be customized and is only used when
    saving with su.
 
 	default value: `sudo`
+
+* `syntax`: turns syntax on or off.
+
+	default value: `true`
 
 * `tabmovement`: navigate spaces at the beginning of lines as if they are tabs
    (e.g. move over 4 spaces at once). This option only does anything if
